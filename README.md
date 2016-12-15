@@ -52,7 +52,6 @@ sh ./build-curl4ios.sh
 
 Set ENV `NDK_ROOT`
 
-Copy `openssl-1.1.0c.tar.gz` to `tools` file folder and run
 
 ```
 cd tools
@@ -72,11 +71,12 @@ sh ./build-openssl4android.sh mips  #for mips
 sh ./build-openssl4android.sh mips64 #for mips64
 ```
 
-> **You must to build openssl first**
+> **You must build openssl first**
 > 
 > **else cURL HTTPS is disable (without ssl)**
 
-Copy `curl-7.51.0.tar.gz` to `tools` file folder and run
+OpenSSL for Android is build with `libz` support using dynamic
+link. `libz` is publically provided by Android system.
 
 ```
 sh ./build-curl4android.sh
