@@ -26,13 +26,13 @@ pwd_path="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
  
 # Setup architectures, library name and other vars + cleanup from previous runs
-ARCHS=("arm64" "armv7s" "armv7" "i386" "x86_64")
-SDKS=("iphoneos" "iphoneos" "iphoneos" "iphonesimulator" "iphonesimulator")
-PLATFORMS=("iPhoneOS" "iPhoneOS" "iPhoneOS" "iPhoneSimulator" "iPhoneSimulator")
+ARCHS=("arm64" "armv7" "i386" "x86_64")
+SDKS=("iphoneos" "iphoneos" "iphonesimulator" "iphonesimulator")
+PLATFORMS=("iPhoneOS" "iPhoneOS" "iPhoneSimulator" "iPhoneSimulator")
 LIB_NAME="curl-7.51.0"
 DEVELOPER=`xcode-select -print-path`
 TOOLCHAIN=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain
-SDK_VERSION=""10.2""
+SDK_VERSION="10.2"
 IPHONEOS_DEPLOYMENT_TARGET="6.0"
 LIB_DEST_DIR="${pwd_path}/../output/ios/curl-ios-universal"
 HEADER_DEST_DIR="include"
