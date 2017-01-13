@@ -54,10 +54,10 @@ configure_make() {
 
     OUTPUT_ROOT=${TOOLS_ROOT}/../output/android/protobuf-${ABI}
     [ -d ${OUTPUT_ROOT}/include ] || mkdir -p ${OUTPUT_ROOT}/include
-    cp -r ${LIB_DEST_DIR}/$ABI/include/ ${OUTPUT_ROOT}/include
+    cp -r ${LIB_DEST_DIR}/$ABI/include/google ${OUTPUT_ROOT}/include
 
     [ -d ${OUTPUT_ROOT}/lib ] || mkdir -p ${OUTPUT_ROOT}/lib
-    find ${LIB_DEST_DIR}/${ABI}/lib -type f -iname '*.a' -exec cp {} ${OUTPUT_ROOT}/lib \;
+    cp ${LIB_DEST_DIR}/${ABI}/lib/libprotbuf-lite.a ${OUTPUT_ROOT}/lib
   fi;
   popd;
 }
