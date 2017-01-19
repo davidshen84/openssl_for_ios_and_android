@@ -39,7 +39,9 @@ LIBS="-lc++ -lc++abi"
 
 PROTOC=`which protoc`
 
-PREFIX=`pwd`/out
+PROTOBUF_SOURCE_DIR=protobuf
+
+PREFIX=`pwd`/../output/protobuf
 if [ -d ${PREFIX} ]
 then
     rm -rf "${PREFIX}"
@@ -120,9 +122,17 @@ build-fat-lib() {
   mkdir -p ${OUT}
 
   PLATFORM_ROOT=${PREFIX}/platform
-  LIB_LITE=libprotobuf-lite.a
   LIPO=lipo
 
+  LIB=libprotobuf.a
+  ${LIPO} ${PLATFORM_ROOT}/arm64/lib/${LIB} \
+          ${PLATFORM_ROOT}/armv7/lib/${LIB} \
+          ${PLATFORM_ROOT}/x86_64-simulator/lib/${LIB} \
+          ${PLATFORM_ROOT}/i386-simulator/lib/${LIB} \
+          -create \
+          -output ${OUT}/${LIB}
+
+  LIB_LITE=libprotobuf-lite.a
   ${LIPO} ${PLATFORM_ROOT}/arm64/lib/${LIB_LITE} \
           ${PLATFORM_ROOT}/armv7/lib/${LIB_LITE} \
           ${PLATFORM_ROOT}/x86_64-simulator/lib/${LIB_LITE} \
@@ -132,6 +142,8 @@ build-fat-lib() {
 }
 
 ## Build pass
+
+cd ${PROTOBUF_SOURCE_DIR}
 
 ./autogen.sh
 
