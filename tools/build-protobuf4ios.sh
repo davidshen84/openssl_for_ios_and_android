@@ -39,21 +39,16 @@ LIBS="-lc++ -lc++abi"
 
 PROTOC=`which protoc`
 
-PROTOBUF_SOURCE_DIR=protobuf
+PROTOBUF_SOURCE_DIR=./protobuf
 
-PREFIX=`pwd`/../output/protobuf
-if [ -d ${PREFIX} ]
-then
-    rm -rf "${PREFIX}"
-fi
-mkdir -p "${PREFIX}/platform"
+PREFIX=`pwd`/../output/ios
+mkdir -p "${PREFIX}"
 
 ## Functions
 
 build-arch() {
   HOST=$1
   ARCH=$2
-  PLATFORM_NAME=${ARCH}
   SYSROOT=${IPHONEOS_SYSROOT}
 
   make distclean
@@ -62,8 +57,7 @@ build-arch() {
     --host=${HOST} \
     --with-protoc=${PROTOC} \
     --disable-shared \
-    --prefix=${PREFIX} \
-    --exec-prefix=${PREFIX}/platform/${PLATFORM_NAME} \
+    --prefix=${PREFIX}/protobuf-ios-${ARCH} \
     "CC=${CC}" \
     "CFLAGS=${CFLAGS} -miphoneos-version-min=${MIN_SDK_VERSION} -arch ${ARCH} -isysroot ${SYSROOT}" \
     "CXX=${CXX}" \
@@ -78,7 +72,6 @@ build-arch() {
 build-i386-simulator() {
   ARCH=i386
   HOST=${ARCH}-apple-${DARWIN}
-  PLATFORM_NAME=${ARCH}-simulator
   SYSROOT=${IPHONESIMULATOR_SYSROOT}
 
   make distclean
@@ -87,8 +80,7 @@ build-i386-simulator() {
     --host=${HOST} \
     --with-protoc=${PROTOC} \
     --disable-shared \
-    --prefix=${PREFIX} \
-    --exec-prefix=${PREFIX}/platform/${PLATFORM_NAME} \
+    --prefix=${PREFIX}/protobuf-simulator-${ARCH} \
     "CC=${CC}" \
     "CFLAGS=${CFLAGS} -mios-simulator-version-min=${MIN_SDK_VERSION} -arch ${ARCH} -isysroot ${SYSROOT}" \
     "CXX=${CXX}" \
@@ -102,12 +94,10 @@ build-i386-simulator() {
 
 build-x86_64-simulator() {
   ARCH=x86_64
-  PLATFORM_NAME=${ARCH}-simulator
   SYSROOT=${IPHONESIMULATOR_SYSROOT}
 
   make distclean
-  ./configure --prefix=${PREFIX} \
-              --exec-prefix=${PREFIX}/platform/${PLATFORM_NAME} \
+  ./configure --prefix=${PREFIX}/protobuf-simulator-${ARCH} \
               --with-sysroot=${SYSROOT} \
               --with-protoc=`which protoc` \
               --enable-static \
@@ -118,27 +108,17 @@ build-x86_64-simulator() {
 }
 
 build-fat-lib() {
-  OUT=${PREFIX}/universal
+  LIB=$1
+  LIPO=lipo
+  OUT=${PREFIX}/protobuf-universal
   mkdir -p ${OUT}
 
-  PLATFORM_ROOT=${PREFIX}/platform
-  LIPO=lipo
-
-  LIB=libprotobuf.a
-  ${LIPO} ${PLATFORM_ROOT}/arm64/lib/${LIB} \
-          ${PLATFORM_ROOT}/armv7/lib/${LIB} \
-          ${PLATFORM_ROOT}/x86_64-simulator/lib/${LIB} \
-          ${PLATFORM_ROOT}/i386-simulator/lib/${LIB} \
+  ${LIPO} ${PREFIX}/protobuf-ios-arm64/lib/${LIB} \
+          ${PREFIX}/protobuf-ios-armv7/lib/${LIB} \
+          ${PREFIX}/protobuf-simulator-x86_64/lib/${LIB} \
+          ${PREFIX}/protobuf-simulator-i386/lib/${LIB} \
           -create \
           -output ${OUT}/${LIB}
-
-  LIB_LITE=libprotobuf-lite.a
-  ${LIPO} ${PLATFORM_ROOT}/arm64/lib/${LIB_LITE} \
-          ${PLATFORM_ROOT}/armv7/lib/${LIB_LITE} \
-          ${PLATFORM_ROOT}/x86_64-simulator/lib/${LIB_LITE} \
-          ${PLATFORM_ROOT}/i386-simulator/lib/${LIB_LITE} \
-          -create \
-          -output ${OUT}/${LIB_LITE}
 }
 
 ## Build pass
@@ -149,10 +129,10 @@ cd ${PROTOBUF_SOURCE_DIR}
 
 build-x86_64-simulator
 build-i386-simulator
-
 build-arch arm arm64
 build-arch armv7-apple-${DARWIN} armv7
 
-build-fat-lib
+build-fat-lib libprotobuf.a
+build-fat-lib libprotobuf-lite.a
 
 echo DONE!
